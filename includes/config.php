@@ -23,7 +23,7 @@ define('COMPANY_NUMBER','Company No: 699400000'); // Company registration number
 define('COMPANY_VAT', 'Company VAT: 690000007'); // Company TAX/VAT number
 
 // EMAIL DETAILS
-define('EMAIL_FROM', 'sales@inms.ccc'); // Email address invoice emails will be sent from
+define('EMAIL_FROM', 'sujithacostha4964@gmail.com'); // Email address invoice emails will be sent from
 define('EMAIL_NAME', 'Invoice Mg System'); // Email from address
 define('EMAIL_SUBJECT', 'Invoice default email subject'); // Invoice email subject
 define('EMAIL_BODY_INVOICE', 'Invoice default body'); // Invoice email body
