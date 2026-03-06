@@ -16,7 +16,7 @@ define('COMPANY_NAME','Invoice Mg System');
 define('COMPANY_ADDRESS_1','123 Something Street');
 define('COMPANY_ADDRESS_2','Collierville, 3590 Lords Way');
 define('COMPANY_ADDRESS_3','Paekinta');
-define('COMPANY_COUNTY','US');
+define('COMPANY_COUNTY','Sri Lanka');
 define('COMPANY_POSTCODE','10100');
 
 define('COMPANY_NUMBER','Company No: 699400000'); // Company registration number

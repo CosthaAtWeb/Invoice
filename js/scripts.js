@@ -485,7 +485,7 @@ $(document).ready(function() {
 
 			$(".required").parent().removeClass("has-error");
 			$("#create_invoice").find(':input:disabled').removeAttr('disabled');
-
+			console.log("This is before: ");
 			$.ajax({
 
 				url: 'response.php',
@@ -493,14 +493,16 @@ $(document).ready(function() {
 				data: $("#create_invoice").serialize(),
 				dataType: 'json',
 				success: function(data){
+					console.log("sucess: " + data);
 					$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);
 					$("#response").removeClass("alert-warning").addClass("alert-success").fadeIn();
 					$("html, body").animate({ scrollTop: $('#response').offset().top }, 1000);
-					$("#create_invoice").before().html("<a href='../invoice-add.php' class='btn btn-primary'>Create new invoice</a>");
+					$("#create_invoice").before().html("<a href='../invoice-create.php' class='btn btn-primary'>Create new invoice</a>");
 					$("#create_invoice").remove();
 					$btn.button("reset");
 				},
 				error: function(data){
+					console.log("error: " + data);
 					$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);
 					$("#response").removeClass("alert-success").addClass("alert-warning").fadeIn();
 					$("html, body").animate({ scrollTop: $('#response').offset().top }, 1000);

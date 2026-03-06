@@ -245,7 +245,7 @@ function getProducts() {
 			    <tr>
 					<td>'.$row["product_name"].'</td>
 				    <td>'.$row["product_desc"].'</td>
-				    <td>$'.$row["product_price"].'</td>
+				    <td>LKR '.$row["product_price"].'</td>
 				    <td><a href="product-edit.php?id='.$row["product_id"].'" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a> <a data-product-id="'.$row['product_id'].'" class="btn btn-danger btn-xs delete-product"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
 			    </tr>
 		    ';

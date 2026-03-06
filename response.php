@@ -1,6 +1,7 @@
 <?php
-
-
+ob_start();
+error_reporting(0);
+ini_set('display_errors', 0);
 include_once('includes/config.php');
 
 // show PHP errors
@@ -83,6 +84,41 @@ if ($action == 'download_csv'){
 									ORDER BY i.invoice";
 
     if ($result_column_data = mysqli_query($mysqli, $query_table_columns_data)) {
+
+    	// Hardcoded column headers with clean names
+        $column_headers = array(
+            'ID',                       // id
+            'Invoice Number',           // invoice
+            'Custom Email',             // custom_email
+            'Invoice Date',             // invoice_date
+            'Invoice Due Date',         // invoice_due_date
+            'Subtotal',                 // subtotal
+            'Shipping',                 // shipping
+            'Discount',                 // discount
+            'VAT',                      // vat
+            'Total',                    // total
+            'Notes',                    // notes
+            'Invoice Type',             // invoice_type
+            'Status',                   // status
+            'Customer ID',              // id (customers table)
+            'Customer Invoice Ref',     // invoice (customers table)
+            'Customer Name',            // name
+            'Email Address',            // email
+            'Address Line 1',           // address_1
+            'Address Line 2',           // address_2
+            'Town',                     // town
+            'County',                   // county
+            'Postcode',                 // postcode
+            'Phone Number',             // phone
+            'Shipping Name',            // name_ship
+            'Shipping Address Line 1',  // address_1_ship
+            'Shipping Address Line 2',  // address_2_ship
+            'Shipping Town',            // town_ship
+            'Shipping County',          // county_ship
+            'Shipping Postcode',        // postcode_ship
+            'Is Deleted',               // IsDelete
+        );
+        fputcsv($file, $column_headers, ",", '"');
 
     	// fetch table fields data
         while ($column_data = $result_column_data->fetch_row()) {
@@ -233,7 +269,7 @@ if ($action == 'create_invoice'){
 
 	// invoice details
 	$invoice_number = $_POST['invoice_id']; // invoice number
-	$custom_email = $_POST['custom_email']; // invoice custom email body
+	// $custom_email = $_POST['custom_email']; // invoice custom email body
 	$invoice_date = $_POST['invoice_date']; // invoice date
 	$custom_email = $_POST['custom_email']; // custom invoice email
 	$invoice_due_date = $_POST['invoice_due_date']; // invoice due date
@@ -245,6 +281,18 @@ if ($action == 'create_invoice'){
 	$invoice_notes = $_POST['invoice_notes']; // Invoice notes
 	$invoice_type = $_POST['invoice_type']; // Invoice type
 	$invoice_status = $_POST['invoice_status']; // Invoice status
+
+	// CHECK: Invoice exists and is NOT in 'Delete' status
+    $check_query = "SELECT id FROM invoices WHERE invoice = '" . $invoice_number . "' AND status != 'Delete' LIMIT 1";
+    $check_result = $mysqli->query($check_query);
+
+    if ($check_result && $check_result->num_rows > 0) {
+        echo json_encode(array(
+            'status'  => 'Error',
+            'message' => 'Invoice #' . $invoice_number . ' already exists and is active. Please use a different invoice number.'
+        ));
+        exit;
+    }
 
 	// insert invoice into database
 	$query = "INSERT INTO invoices (
@@ -338,28 +386,29 @@ if ($action == 'create_invoice'){
 			);
 		";
 
-	}
-
-	header('Content-Type: application/json');
+	}	
 
 	// execute the query
 	if($mysqli -> multi_query($query)){
-		//if saving success
-		echo json_encode(array(
-			'status' => 'Success',
-			'message' => 'Invoice has been created successfully!'
-		));
 
 		//Set default date timezone
 		date_default_timezone_set(TIMEZONE);
 		//Include Invoicr class
 		include('invoice.php');
 		//Create a new instance
-		$invoice = new invoicr("A4",CURRENCY,"en");
+		//$invoice = new invoicr("A4",CURRENCY,"en");
+ 
+		$invoice = new invoicr("A4", CURRENCY, "en");
+		
+		//For debugin
+		// echo "Font path: " . $invoice->fontpath . "<br>";
+		// echo "FPDF file: " . (new ReflectionClass('FPDF'))->getFileName() . "<br>";
+		// die();
+
 		//Set number formatting
 		$invoice->setNumberFormat('.',',');
 		//Set your logo
-		$invoice->setLogo(COMPANY_LOGO,COMPANY_LOGO_WIDTH,COMPANY_LOGO_HEIGHT);
+		//$invoice->setLogo(COMPANY_LOGO,COMPANY_LOGO_WIDTH,COMPANY_LOGO_HEIGHT);
 		//Set theme color
 		$invoice->setColor(INVOICE_THEME);
 		//Set type
@@ -386,11 +435,14 @@ if ($action == 'create_invoice'){
 		    $item_discount = $_POST['invoice_product_discount'][$key];
 		    $item_subtotal = $_POST['invoice_product_sub'][$key];
 
+			$item_vat = false; // default
+
 		   	if(ENABLE_VAT == true) {
 		   		$item_vat = (VAT_RATE / 100) * $item_subtotal;
 		   	}
 
-		    $invoice->addItem($item_product,'',$item_qty,$item_vat,$item_price,$item_discount,$item_subtotal);
+		    $invoice->addItem($item_product,'',$item_qty,$item_vat,$item_price,$item_subtotal,$item_discount); 
+		  
 		}
 		//Add totals
 		$invoice->addTotal("Total",$invoice_subtotal);
@@ -419,6 +471,18 @@ if ($action == 'create_invoice'){
 		$invoice->setFooternote(FOOTER_NOTE);
 		//Render the PDF
 		$invoice->render('invoices/'.$invoice_number.'.pdf','F');
+
+		ob_clean();
+		header('Content-Type: application/json');
+
+		//if saving success
+		echo json_encode(array(
+			'status' => 'Success',
+			'message' => 'Invoice has been created successfully!'
+		));
+	
+		exit;
+
 	} else {
 		// if unable to create invoice
 		echo json_encode(array(
@@ -427,7 +491,11 @@ if ($action == 'create_invoice'){
 			// debug
 			//'message' => 'There has been an error, please try again.<pre>'.$mysqli->error.'</pre><pre>'.$query.'</pre>'
 		));
+
+		exit;
 	}
+
+
 
 	//close database connection
 	$mysqli->close();

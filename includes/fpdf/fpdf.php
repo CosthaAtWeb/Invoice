@@ -103,16 +103,20 @@ function FPDF($orientation='P', $unit='mm', $size='A4')
 	$this->ColorFlag = false;
 	$this->ws = 0;
 	// Font path
-	if(defined('FPDF_FONTPATH'))
-	{
-		$this->fontpath = FPDF_FONTPATH;
-		if(substr($this->fontpath,-1)!='/' && substr($this->fontpath,-1)!='\\')
-			$this->fontpath .= '/';
-	}
-	elseif(is_dir(dirname(__FILE__).'/font'))
-		$this->fontpath = dirname(__FILE__).'/font/';
-	else
-		$this->fontpath = '';
+	// if(defined('FPDF_FONTPATH'))
+	// {
+	// 	$this->fontpath = FPDF_FONTPATH;
+	// 	if(substr($this->fontpath,-1)!='/' && substr($this->fontpath,-1)!='\\')
+	// 		$this->fontpath .= '/';
+	// }
+	// elseif(is_dir(dirname(__FILE__).'/font'))
+	// 	$this->fontpath = dirname(__FILE__).'/font/';
+	// else
+	// 	$this->fontpath = '';
+
+	// Font path
+	$this->fontpath = 'C:/xampp/htdocs/Invoice/includes/fpdf/font/';
+
 	// Core fonts
 	$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats');
 	// Scale factor
@@ -1012,7 +1016,7 @@ function Output($name='', $dest='')
 			}
 			echo $this->buffer;
 			break;
-		case 'D':
+		case 'D': // this is line 1115 in fpdf.php
 			// Download file
 			$this->_checkoutput();
 			header('Content-Type: application/x-download');
@@ -1045,15 +1049,7 @@ function Output($name='', $dest='')
 *******************************************************************************/
 function _dochecks()
 {
-	// Check availability of %F
-	if(sprintf('%.1F',1.0)!='1.0')
-		$this->Error('This version of PHP is not supported');
-	// Check mbstring overloading
-	if(ini_get('mbstring.func_overload') & 2)
-		$this->Error('mbstring overloading must be disabled');
-	// Ensure runtime magic quotes are disabled
-	if(get_magic_quotes_runtime())
-		@set_magic_quotes_runtime(0);
+// magic_quotes removed in PHP 8, nothing to check
 }
 
 function _checkoutput()

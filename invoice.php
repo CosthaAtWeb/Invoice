@@ -1,9 +1,10 @@
 <?php
 require_once('includes/autoload.php');
-
+define('FPDF_FONTPATH', dirname(__FILE__) . '/includes/fpdf/font/');
+#[\AllowDynamicProperties]
 class invoicr extends FPDF_rotation 
 {
-
+	var $currency = 'LKR';
 	var $font = 'helvetica';
 	var $columnOpacity = 0.06;
 	var $columnSpacing = 0.3;
@@ -27,13 +28,14 @@ class invoicr extends FPDF_rotation
 	var $addText;
 	var $footernote;
 	var $dimensions;
-	
-	/*******************************************************************************
-	*                                                                              *
-	*                               Public methods                                 *
-	*                                                                              *
-	*******************************************************************************/
-	function invoicr($size='A4',$currency='€',$language='en')
+
+	// function __construct($orientation='P', $unit='mm', $size='A4')
+	// {
+	// 	parent::__construct($orientation, $unit, $size);
+	// 	$this->fontpath = 'C:/xampp/htdocs/Invoice/includes/fpdf/font/';
+	// }
+
+	function __construct($size='A4', $currency='LKR', $language='en')
 	{
 		$this->columns = 5;
 		$this->items = array();
@@ -47,10 +49,34 @@ class invoicr extends FPDF_rotation
 		$this->setDocumentSize($size);
 		$this->setColor("#222222");
 		
-		$this->FPDF('P','mm',array($this->document['w'],$this->document['h']));
+		parent::FPDF('P', 'mm', array($this->document['w'], $this->document['h']));
+		$this->fontpath = 'C:/xampp/htdocs/Invoice/includes/fpdf/font/';
 		$this->AliasNbPages();
-		$this->SetMargins($this->margins['l'],$this->margins['t'],$this->margins['r']);
+		$this->SetMargins($this->margins['l'], $this->margins['t'], $this->margins['r']);
 	}
+	/*******************************************************************************
+	*                                                                              *
+	*                               Public methods                                 *
+	*                                                                              *
+	*******************************************************************************/
+	// function invoicr($size='A4',$currency='LKR',$language='en')
+	// {
+	// 	$this->columns = 5;
+	// 	$this->items = array();
+	// 	$this->totals = array();
+	// 	$this->addText = array();
+	// 	$this->firstColumnWidth = 70;
+	// 	$this->currency = $currency;
+	// 	$this->maxImageDimensions = array(230,130);
+		
+	// 	$this->setLanguage($language);
+	// 	$this->setDocumentSize($size);
+	// 	$this->setColor("#222222");
+		
+	// 	$this->FPDF('P','mm',array($this->document['w'],$this->document['h']));
+	// 	$this->AliasNbPages();
+	// 	$this->SetMargins($this->margins['l'],$this->margins['t'],$this->margins['r']);
+	// }
 	
 	function setType($title)
 	{
@@ -112,7 +138,7 @@ class invoicr extends FPDF_rotation
 		$this->flipflop = true;
 	}
 	
-	function addItem($item,$description,$quantity,$vat,$price,$discount=0,$total)
+	function addItem($item,$description,$quantity,$vat,$price,$total,$discount=0)
 	{
 		$p['item'] 			= $item;
 		$p['description'] 	= $this->br2nl($description);
@@ -136,6 +162,30 @@ class invoicr extends FPDF_rotation
 		
 		$this->items[]		= $p;
 	}
+
+	// function addItem($name, $description, $quantity, $vat, $price, $total, $discount = 0){
+	// 	//$p['item'] 			= $item;
+	// 	$p['description'] 	= $this->br2nl($description);
+	// 	$p['vat']			= $vat;
+	// 	if(is_numeric($vat)) {
+	// 		$p['vat']		= $this->currency.' '.number_format($vat,2,$this->referenceformat[0],$this->referenceformat[1]);
+	// 	} 
+	// 	$p['quantity'] 		= $quantity;
+	// 	$p['price']			= $price;
+	// 	$p['total']			= $total;
+		
+	// 	if($discount!==false) {
+	// 		$this->firstColumnWidth = 58;
+	// 		$p['discount'] = $discount;
+	// 		if(is_numeric($discount)) {
+	// 			$p['discount']	= $this->currency.' '.number_format($discount,2,$this->referenceformat[0],$this->referenceformat[1]);
+	// 		}
+	// 		$this->discountField = true;
+	// 		$this->columns = 6;
+	// 	}
+		
+	// 	$this->items[]		= $p;
+	// }
 	
 	function addTotal($name,$value,$colored=0)
 	{
@@ -188,6 +238,8 @@ class invoicr extends FPDF_rotation
 	    	$this->Image($this->logo,$this->margins['l'],$this->margins['t'],$this->dimensions[0],$this->dimensions[1]);
 	    }
 
+		// $this->AddFont('Arial', '', 'arial.php');
+		// $this->SetFont('Arial', '', 12);
 	    //Title
 		$this->SetTextColor(0,0,0);
 		$this->SetFont($this->font,'B',20);
