@@ -60,102 +60,106 @@ if ($action == 'email_invoice'){
 	}
 
 }
+
 // download invoice csv sheet
 if ($action == 'download_csv'){
 
-	header("Content-type: text/csv"); 
+    // output any connection error
+    if ($mysqli->connect_error) {
+        die('Error : ('.$mysqli->connect_errno .') '. $mysqli->connect_error);
+    }
 
-	// output any connection error
-	if ($mysqli->connect_error) {
-		die('Error : ('.$mysqli->connect_errno .') '. $mysqli->connect_error);
-	}
- 
-    $file_name = 'invoice-export-'.date('d-m-Y').'.csv';   // file name
-    $file_path = 'downloads/'.$file_name; // file path
+    $file_name = 'invoice-export-'.date('d-m-Y').'.csv';
+    $file_path = 'downloads/'.$file_name;
 
-	$file = fopen($file_path, "w"); // open a file in write mode
-    chmod($file_path, 0777);    // set the file permission
+    // Delete old CSV files
+    $old_files = glob('downloads/invoice-export-*.csv');
+    if ($old_files) {
+        foreach ($old_files as $old_file) {
+            if (is_file($old_file)) unlink($old_file);
+        }
+    }
 
-    $query_table_columns_data = "SELECT * 
-									FROM invoices i
-									JOIN customers c
-									ON c.invoice = i.invoice
-									WHERE i.invoice = c.invoice
-									ORDER BY i.invoice";
+    $file = fopen($file_path, "w");
+    fwrite($file, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+    chmod($file_path, 0777);
+
+    // Manual CSV row formatter — works on all servers
+    function format_csv_row($array) {
+        $fields = array();
+        foreach ($array as $field) {
+            $field    = str_replace('"', '""', $field ?? '');
+            $fields[] = '"' . $field . '"';
+        }
+        return implode(',', $fields) . "\r\n";
+    }
+
+    $query_table_columns_data = "SELECT i.invoice, i.invoice_date, i.invoice_due_date, 
+                                    i.subtotal, i.shipping, i.discount, 
+                                    i.vat, i.total, i.notes, i.invoice_type,
+                                    i.status, c.name, c.email, c.address_1,
+                                    c.address_2, c.town, c.county,
+                                    c.postcode, c.phone, c.name_ship, c.address_1_ship,
+                                    c.address_2_ship, c.town_ship, c.county_ship, c.postcode_ship
+                                FROM invoices i
+                                JOIN customers c ON c.invoice = i.invoice
+                                ORDER BY i.invoice_date ASC";
 
     if ($result_column_data = mysqli_query($mysqli, $query_table_columns_data)) {
 
-    	// Hardcoded column headers with clean names
         $column_headers = array(
-            'ID',                       // id
-            'Invoice Number',           // invoice
-            'Custom Email',             // custom_email
-            'Invoice Date',             // invoice_date
-            'Invoice Due Date',         // invoice_due_date
-            'Subtotal',                 // subtotal
-            'Shipping',                 // shipping
-            'Discount',                 // discount
-            'VAT',                      // vat
-            'Total',                    // total
-            'Notes',                    // notes
-            'Invoice Type',             // invoice_type
-            'Status',                   // status
-            'Customer ID',              // id (customers table)
-            'Customer Invoice Ref',     // invoice (customers table)
-            'Customer Name',            // name
-            'Email Address',            // email
-            'Address Line 1',           // address_1
-            'Address Line 2',           // address_2
-            'Town',                     // town
-            'County',                   // county
-            'Postcode',                 // postcode
-            'Phone Number',             // phone
-            'Shipping Name',            // name_ship
-            'Shipping Address Line 1',  // address_1_ship
-            'Shipping Address Line 2',  // address_2_ship
-            'Shipping Town',            // town_ship
-            'Shipping County',          // county_ship
-            'Shipping Postcode',        // postcode_ship
-            'Is Deleted',               // IsDelete
+            'Invoice Number',
+            'Invoice Date',
+            'Invoice Due Date',
+            'Subtotal',
+            'Shipping',
+            'Discount',
+            'VAT',
+            'Total',
+            'Notes',
+            'Invoice Type',
+            'Status',
+            'Customer Name',
+            'Email Address',
+            'Address Line 1',
+            'Address Line 2',
+            'Town',
+            'County',
+            'Postcode',
+            'Phone Number',
+            'Shipping Name',
+            'Shipping Address Line 1',
+            'Shipping Address Line 2',
+            'Shipping Town',
+            'Shipping County',
+            'Shipping Postcode',
         );
-        fputcsv($file, $column_headers, ",", '"');
 
-    	// fetch table fields data
+        // Write headers
+        fwrite($file, format_csv_row($column_headers));
+
+        // Write data rows
         while ($column_data = $result_column_data->fetch_row()) {
-
-            $table_column_data = array();
-            foreach($column_data as $data) {
-                $table_column_data[] = $data;
-            }
-
-            // Format array as CSV and write to file pointer
-            fputcsv($file, $table_column_data, ",", '"');
+            fwrite($file, format_csv_row($column_data));
         }
 
-	}
+        // Close file before sending response
+        fclose($file);
 
-    //if saving success
-    if ($result_column_data = mysqli_query($mysqli, $query_table_columns_data)) {
-		echo json_encode(array(
-			'status' => 'Success',
-			'message'=> 'CSV has been generated and is available in the /downloads folder for future reference, you can download by <a href="downloads/'.$file_name.'">clicking here</a>.'
-		));
+        echo json_encode(array(
+            'status'  => 'Success',
+            'message' => 'CSV has been generated. Download by <a href="download_file.php?file='.urlencode($file_name).'">clicking here</a>.'
+        ));
 
-	} else {
-	    //if unable to create new record
-	    echo json_encode(array(
-	    	'status' => 'Error',
-	    	//'message'=> 'There has been an error, please try again.'
-	    	'message' => 'There has been an error, please try again.<pre>'.$mysqli->error.'</pre><pre>'.$query.'</pre>'
-	    ));
-	}
-
- 
-    // close file pointer
-    fclose($file);
+    } else {
+        fclose($file);
+        echo json_encode(array(
+            'status'  => 'Error',
+            'message' => 'There has been an error, please try again.<pre>'.$mysqli->error.'</pre>'
+        ));
+    }
 
     $mysqli->close();
-
 }
 
 // Create customer
@@ -396,19 +400,10 @@ if ($action == 'create_invoice'){
 		//Include Invoicr class
 		include('invoice.php');
 		//Create a new instance
-		//$invoice = new invoicr("A4",CURRENCY,"en");
  
 		$invoice = new invoicr("A4", CURRENCY, "en");
-		
-		//For debugin
-		// echo "Font path: " . $invoice->fontpath . "<br>";
-		// echo "FPDF file: " . (new ReflectionClass('FPDF'))->getFileName() . "<br>";
-		// die();
-
 		//Set number formatting
 		$invoice->setNumberFormat('.',',');
-		//Set your logo
-		//$invoice->setLogo(COMPANY_LOGO,COMPANY_LOGO_WIDTH,COMPANY_LOGO_HEIGHT);
 		//Set theme color
 		$invoice->setColor(INVOICE_THEME);
 		//Set type
@@ -488,8 +483,6 @@ if ($action == 'create_invoice'){
 		echo json_encode(array(
 			'status' => 'Error',
 			'message' => 'There has been an error, please try again.'
-			// debug
-			//'message' => 'There has been an error, please try again.<pre>'.$mysqli->error.'</pre><pre>'.$query.'</pre>'
 		));
 
 		exit;
@@ -523,7 +516,7 @@ if($action == 'delete_invoice') {
 	    //if saving success
 		echo json_encode(array(
 			'status' => 'Success',
-			'message'=> 'Product has been deleted successfully!'
+			'message'=> 'Invoice has been deleted successfully!'
 		));
 
 	} else {

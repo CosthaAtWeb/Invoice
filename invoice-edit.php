@@ -76,11 +76,11 @@ $mysqli->close();
 			<input type="hidden" name="action" value="update_invoice">
 			<input type="hidden" name="update_id" value="<?php echo $getID; ?>">
 
-			<div class="row">
+			<!-- <div class="row">
 				<div class="col-xs-12">
 					<textarea name="custom_email" id="custom_email" class="custom_email_textarea" placeholder="Enter a custom email message here if you wish to override the default invoice type email message."><?php echo $custom_email; ?></textarea>
 				</div>
-			</div>
+			</div> -->
 
 			<div class="row">
 				<div class="col-xs-5">

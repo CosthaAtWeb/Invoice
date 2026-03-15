@@ -8,6 +8,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
   <title>Invoice Management System</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
@@ -66,7 +68,7 @@
         <ul class="nav navbar-nav">
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="https://pcrt.crab.org/images/default-user.png" class="user-image" alt="User Image">
+              <img src="images/default-user.png" class="user-image" alt="User Image">
               <span class="hidden-xs"><?php echo $_SESSION['login_username'];?></span>
             </a>
             <ul class="dropdown-menu">
@@ -95,7 +97,7 @@
           <ul class="treeview-menu">
             <li><a href="invoice-create.php"><i class="fa fa-plus"></i> Create Invoice</a></li>
             <li><a href="invoice-list.php"><i class="fa fa-cog"></i> Manage Invoices</a></li>
-            <li><a href="#" class="download-csv"><i class="fa fa-download"></i> Download CSV</a></li>
+            <!-- <li><a href="#" class="download-csv"><i class="fa fa-download"></i> Download CSV</a></li> -->
           </ul>
         </li>
 

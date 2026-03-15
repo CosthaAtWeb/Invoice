@@ -15,7 +15,7 @@ include('functions.php');
         <!-- Logo / Header -->
         <div class="login-card-header">
             <h1 class="text-center">
-                <img src="<?php echo COMPANY_LOGO ?>" class="img-responsive" style="max-height:60px; margin:0 auto;">
+                <img src="<?php echo COMPANY_LOGO ?>" class="img-responsive" style="max-height:100px; margin:0 auto;">
             </h1>
             <p class="login-subtitle">Sign in to your account</p>
         </div>

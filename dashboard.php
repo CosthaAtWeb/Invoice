@@ -23,14 +23,14 @@ include_once("includes/config.php");
                 
                 $result = mysqli_query($mysqli, 'SELECT SUM(subtotal) AS value_sum FROM invoices WHERE status = "paid"'); 
                 $row = mysqli_fetch_assoc($result); 
-                $sum = $row['value_sum'];
-                echo $sum;
+                $sum = $row['value_sum'] ?? 0;
+                echo number_format($sum, 2);
                 ?></h3>
 
               <p>Sales Amount</p>
             </div>
             <div class="icon">
-              <i class="ion ion-social-usd"></i>
+              <i class="ion">LKR</i>
             </div>
             
           </div>
@@ -84,10 +84,10 @@ include_once("includes/config.php");
             <div class="inner">
             <h3><?php 
                 
-                $result = mysqli_query($mysqli, 'SELECT SUM(subtotal) AS value_sum FROM invoices WHERE status = "open"'); 
+                $result = mysqli_query($mysqli, 'SELECT SUM(total) AS value_sum FROM invoices WHERE status = "open"'); 
                 $row = mysqli_fetch_assoc($result); 
-                $sum = $row['value_sum'];
-                echo $sum;
+                $sum = $row['value_sum'] ?? 0;
+                echo number_format($sum, 2);
                 ?></h3>
 
               <p>Due Amount</p>

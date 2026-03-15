@@ -778,12 +778,18 @@ $(document).ready(function() {
 				data: $("#login_form").serialize(), // serializes the form's elements.
 				dataType: 'json',
 				success: function(data){
-					$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);
-					$("#response").removeClass("alert-warning").addClass("alert-success").fadeIn();
-					$("html, body").animate({ scrollTop: $('#response').offset().top }, 1000);
-					$btn.button("reset");
-
-					window.location = "dashboard.php";
+				    $("#response .message").html(
+                        "<strong>" + data.status + "</strong>: " + data.message
+                    );
+            
+                    $("#response")
+                        .removeClass("alert-warning")
+                        .addClass("alert-success")
+                        .fadeIn();
+            
+                    if(data.status === "Success"){
+                        window.location.href = "dashboard.php";
+                    }
 				},
 				error: function(data){
 					$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);

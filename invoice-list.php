@@ -19,9 +19,12 @@ include('functions.php');
 		</div>
 	
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4>Manage Invoices</h4>
-			</div>
+			<div class="panel-heading" style="display:flex; align-items:center; justify-content:space-between;">
+                <h4 style="margin:0;">Manage Invoices</h4>
+                <a href="#" class="btn btn-success btn-sm download-csv">
+                    <i class="fa fa-download"></i> Download CSV
+                </a>
+            </div>
 			<div class="panel-body form-group form-group-sm">
 				<?php getInvoices(); ?>
 			</div>

@@ -3,6 +3,25 @@
 
 include_once("includes/config.php");
 
+function updateOverdueInvoices() {
+    global $mysqli;
+    
+    $lock_file = sys_get_temp_dir() . '/overdue_check.lock';
+    $last_run  = file_exists($lock_file) ? filemtime($lock_file) : 0;
+    
+    if (time() - $last_run < 3600) return; // skip if ran within last hour
+    
+    touch($lock_file);
+    
+    $query = "UPDATE invoices 
+              SET status = 'overdue' 
+              WHERE invoice_due_date < CURDATE() 
+              AND status = 'open'";
+    $mysqli->query($query);
+}
+
+updateOverdueInvoices();
+
 // get invoice list
 function getInvoices() {
 
@@ -55,10 +74,17 @@ function getInvoices() {
 					print '<td><span class="label label-primary">'.$row['status'].'</span></td>';
 				} elseif ($row['status'] == "paid"){
 					print '<td><span class="label label-success">'.$row['status'].'</span></td>';
+				}elseif($row['status'] == "Overdue"){
+					print '<td><span class="label label-danger">'.$row['status'].'</span></td>';
+				}else{
+					print '<td><span class="label label-warning">'.$row['status'].'</span></td>';
 				}
 
 			print '
-				    <td><a href="invoice-edit.php?id='.$row["invoice"].'" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a> <a href="#" data-invoice-id="'.$row['invoice'].'" data-email="'.$row['email'].'" data-invoice-type="'.$row['invoice_type'].'" data-custom-email="'.$row['custom_email'].'" class="btn btn-success btn-xs email-invoice"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a> <a href="invoices/'.$row["invoice"].'.pdf" class="btn btn-info btn-xs" target="_blank"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a> <a data-invoice-id="'.$row['invoice'].'" class="btn btn-danger btn-xs delete-invoice"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
+				    <td>
+					<a href="invoice-edit.php?id='.$row["invoice"].'" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a> 
+					<a href="invoices/'.$row["invoice"].'.pdf" class="btn btn-info btn-xs" target="_blank"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a> 
+					<a data-invoice-id="'.$row['invoice'].'" class="btn btn-danger btn-xs delete-invoice"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
 			    </tr>
 			';
 
