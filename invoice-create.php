@@ -818,7 +818,7 @@ include('functions.php');
         <div>
           <strong>TAX / VAT</strong>
           <div class="vat-remove-label">
-            <input type="checkbox" class="remove_vat" id="remove_vat">
+            <input type="checkbox" class="remove_vat" id="remove_vat" checked="false" autocomplete="off">
             <label for="remove_vat" style="cursor:pointer;margin:0;">Remove VAT</label>
           </div>
         </div>

@@ -612,7 +612,7 @@ $(document).ready(function() {
 
         	url: 'response.php',
             type: 'POST', 
-            data: invoiceId,
+           	data: { action: 'delete_invoice', delete: invoiceId },
             dataType: 'json', 
             success: function(data){
 				$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);

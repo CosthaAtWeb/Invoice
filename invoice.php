@@ -1,4 +1,6 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', 0);
 require_once('includes/autoload.php');
 define('FPDF_FONTPATH', dirname(__FILE__) . '/includes/fpdf/font/');
 #[\AllowDynamicProperties]
@@ -255,9 +257,6 @@ class invoicr extends FPDF_rotation
 			// Column headers
 			$this->SetFont($this->font, 'B', 7);
 			$this->SetTextColor($this->color[0], $this->color[1], $this->color[2]);
-			// $this->Cell($colW, 5, strtoupper($this->l['from']), 0, 0, 'L');
-			// $this->Cell($colW, 5, strtoupper($this->l['to']),   0, 0, 'L');
-			// $this->Cell($colW, 5, strtoupper($this->l['ship']), 0, 1, 'L');
 			$this->Cell($colW, 5, strtoupper($this->l['from'] ?? ''), 0, 0, 'L');
 			$this->Cell($colW, 5, strtoupper($this->l['to']   ?? ''), 0, 0, 'L');
 			$this->Cell($colW, 5, strtoupper($this->l['ship'] ?? ''), 0, 1, 'L');
@@ -272,9 +271,6 @@ class invoicr extends FPDF_rotation
 			// First name row bold
 			$this->SetFont($this->font, 'B', 8);
 			$this->SetTextColor(40, 40, 40);
-			// $this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", $this->from[0] ?? ''), 0, 0, 'L');
-			// $this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", $this->to[0]   ?? ''), 0, 0, 'L');
-			// $this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", $this->ship[0] ?? ''), 0, 1, 'L');
 			$this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", $this->from[0] ?? ''), 0, 0, 'L');
 			$this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", $this->to[0]   ?? ''), 0, 0, 'L');
 			$this->Cell($colW, 5, iconv("UTF-8", "ISO-8859-1", isset($this->ship[0]) ? $this->ship[0] : ''), 0, 1, 'L');
@@ -282,12 +278,6 @@ class invoicr extends FPDF_rotation
 			// Remaining rows smaller
 			$this->SetFont($this->font, '', 7);
 			$this->SetTextColor(100, 100, 100);
-			// $maxRows = max(count($this->from), count($this->to), count($this->ship));
-			// for ($i = 1; $i < $maxRows; $i++) {
-			// 	$this->Cell($colW, 4, iconv("UTF-8", "ISO-8859-1", $this->from[$i] ?? ''), 0, 0, 'L');
-			// 	$this->Cell($colW, 4, iconv("UTF-8", "ISO-8859-1", $this->to[$i]   ?? ''), 0, 0, 'L');
-			// 	$this->Cell($colW, 4, iconv("UTF-8", "ISO-8859-1", $this->ship[$i] ?? ''), 0, 1, 'L');
-			// }
 			$fromCount = is_array($this->from) ? count($this->from) : 0;
 			$toCount   = is_array($this->to)   ? count($this->to)   : 0;
 			$shipCount = is_array($this->ship) ? count($this->ship) : 0;

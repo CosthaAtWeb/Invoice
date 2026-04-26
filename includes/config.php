@@ -8,6 +8,7 @@ define('DATABASE_NAME', 'u792171406_sh_invoice'); //invoicemgsys
 define('DATABASE_USER', 'root');
 define('DATABASE_PASS', '');
 
+
 // COMPANY INFORMATION
 define('COMPANY_LOGO', 'images/SH.png');
 define('COMPANY_LOGO_WIDTH', '1000');
