@@ -115,17 +115,18 @@ $(document).ready(function() {
    	});
 
 	// delete invoice
-	$(document).on('click', ".delete-invoice", function(e) {
-        e.preventDefault();
+	$(document).on('click', '.delete-invoice', function(e) {
+		e.preventDefault();
+		var invoiceId = $(this).attr('data-invoice-id');
+		$('#delete').attr('data-invoice-id', invoiceId); // store ID on confirm button
+		$('#delete_invoice').modal({ backdrop: 'static', keyboard: false });
+	});
 
-        var invoiceId = 'action=delete_invoice&delete='+ $(this).attr('data-invoice-id'); //build a post data structure
-        var invoice = $(this);
-
-	    $('#delete_invoice').modal({ backdrop: 'static', keyboard: false }).one('click', '#delete', function() {
-			deleteInvoice(invoiceId);
-			$(invoice).closest('tr').remove();
-        });
-   	});
+	$(document).on('click', '#delete', function() {
+		var invoiceId = $(this).attr('data-invoice-id');
+		deleteInvoice(invoiceId);
+		$('#delete_invoice').modal('hide');
+	});
 
 	// delete product
 	$(document).on('click', ".delete-product", function(e) {
@@ -607,28 +608,27 @@ $(document).ready(function() {
    	}
 
    	function deleteInvoice(invoiceId) {
+		document.activeElement.blur();
+		$('#delete_invoice').modal('hide');
 
-        jQuery.ajax({
-
-        	url: 'response.php',
-            type: 'POST', 
-           	data: { action: 'delete_invoice', delete: invoiceId },
-            dataType: 'json', 
-            success: function(data){
+		jQuery.ajax({
+			url: 'response.php',
+			type: 'POST',
+			data: { action: 'delete_invoice', delete: invoiceId }, // now correctly just the ID
+			dataType: 'json',
+			success: function(data) {
 				$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);
 				$("#response").removeClass("alert-warning").addClass("alert-success").fadeIn();
 				$("html, body").animate({ scrollTop: $('#response').offset().top }, 1000);
-				$btn.button("reset");
+				setTimeout(function() { location.reload(); }, 1500);
 			},
-			error: function(data){
-				$("#response .message").html("<strong>" + data.status + "</strong>: " + data.message);
+			error: function(xhr) {
+				$("#response .message").html("<strong>Error</strong>: " + xhr.responseText);
 				$("#response").removeClass("alert-success").addClass("alert-warning").fadeIn();
 				$("html, body").animate({ scrollTop: $('#response').offset().top }, 1000);
-				$btn.button("reset");
-			} 
-    	});
-
-   	}
+			}
+		});
+	}
 
    	function updateProduct() {
 

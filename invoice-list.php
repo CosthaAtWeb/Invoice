@@ -43,12 +43,12 @@ include('functions.php');
         <p>Are you sure you want to delete this invoice?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
-		<button type="button" data-dismiss="modal" class="btn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="delete" data-invoice-id="">Delete</button>
+        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    </div>
+  </div>
+</div>
 
 <?php
 	include('footer.php');

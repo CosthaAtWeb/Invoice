@@ -423,6 +423,8 @@ if ($action == 'create_invoice'){
 // Delete invoce
 if($action == 'delete_invoice') {
 
+	file_put_contents('debug.log', print_r($_POST, true));
+
 	// output any connection error
 	if ($mysqli->connect_error) {
 	    die('Error : ('. $mysqli->connect_errno .') '. $mysqli->connect_error);
@@ -431,7 +433,7 @@ if($action == 'delete_invoice') {
 	$id = $_POST["delete"];
 
 	// the query
-	$id = $mysqli->real_escape_string($_POST['delete']);
+	// $id = $mysqli->real_escape_string($_POST['delete']);
 	$query  = "DELETE FROM invoices      WHERE invoice = '" . $id . "';";
 	$query .= "DELETE FROM customers     WHERE invoice = '" . $id . "';";
 	$query .= "DELETE FROM invoice_items WHERE invoice = '" . $id . "';";
